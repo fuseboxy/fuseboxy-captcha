@@ -2,59 +2,137 @@
 class Captcha {
 
 
-	private static $error;
-
-
 	// get (latest) error message
-	public static function error() {
-		return self::$error;
+	private static $error;
+	public static function error() { return self::$error; }
+
+
+
+
+	/**
+	<fusedoc>
+		<description>
+			get html of client-api javascript tag
+			===> display this snippet before the closing </head> tag on your HTML template
+		</description>
+	</fusedoc>
+	*/
+	public static function getClientAPI() {
+		return "<script src='https://www.google.com/recaptcha/api.js'></script>";
 	}
 
 
-	// get html of captcha field
-	public static function getField() {
-		return "<div class='g-recaptcha' data-sitekey='{$boxy->config['reCAPTCHA']['sitekey']}' style='display: inline-block;'></div>";
-	}
-
-	// display captcha field
-	public static function renderField() {
-		echo self::getField();
-	}
 
 
-	// validate captcha against posted data
-	public static function validate() {
-		/*
-		<fusedoc>
-			<io>
-				<in>
-					<structure name="config" scope="$boxy">
-						<structure name="reCAPTCHA">
-							<string name="sitekey" />
-							<string name="secret" />
-							<string name="url" />
-						</structure>
+	/**
+	<fusedoc>
+		<description>
+			get html of captcha field
+		</description>
+		<io>
+			<in>
+				<structure name="config" scope="$fusebox">
+					<structure name="reCAPTCHA" optional="yes">
+						<string name="sitekey" />
 					</structure>
-					<string name="g-recaptcha-response" scope="$_POST" comments="user submitted data" />
-				</in>
-				<out>
-					<boolean name="~return~" />
-				</out>
-			</io>
-		</fusedoc>
-		*/
+				</structure>
+			</in>
+			<out />
+		</io>
+	</fusedoc>
+	*/
+	public static function getField() {
+		$captcha = F::config('reCAPTCHA');
 		// validate
-		if ( !isset($_POST['g-recaptcha-response']) ) {
+		if ( empty($captcha) ) {
+			self::$error = 'Captcha config was not defined';
+			return false;
+		} elseif ( empty($captcha['sitekey']) ) {
+			self::$error = 'Captcha [sitekey] was not defined';
+			return false;
+		}
+		// done!
+		return "<div class='g-recaptcha' data-sitekey='{$captcha['sitekey']}' style='display: inline-block;'></div>";
+	}
+
+
+
+
+	/**
+	<fusedoc>
+		<description>
+			display client-api javascript tag
+		</description>
+	</fusedoc>
+	*/
+	public static function renderClientAPI() {
+		$html = self::getClientAPI();
+		echo ( $html === false ) ? self::error() : $html;
+	}
+
+
+
+
+	/**
+	<fusedoc>
+		<description>
+			display captcha field
+		</description>
+	</fusedoc>
+	*/
+	public static function renderField() {
+		$html = self::getField();
+		echo ( $html === false ) ? self::error() : $html;
+	}
+
+
+
+
+	/**
+	<fusedoc>
+		<description>
+			validate captcha against posted data
+		</description>
+		<io>
+			<in>
+				<structure name="config" scope="$fusebox">
+					<structure name="reCAPTCHA">
+						<string name="sitekey" />
+						<string name="secret" />
+						<string name verify" />
+					</structure>
+				</structure>
+				<string name="g-recaptcha-response" scope="$_POST" comments="user submitted data" />
+			</in>
+			<out>
+				<boolean name="~return~" />
+			</out>
+		</io>
+	</fusedoc>
+	*/
+	public static function validate() {
+		$captcha = F::config('reCAPTCHA');
+		// validate
+		if ( empty($captcha) ) {
+			self::$error = 'Captcha config was not defined';
+			return false;
+		} elseif ( empty($captcha['secret']) ) {
+			self::$error = 'Captcha [secret] was not defined';
+			return false;
+		} elseif ( empty($captcha['verify']) ) {
+			self::$error = 'Captcha [verify] was not defined';
+			return false;
+		} elseif ( !isset($_POST['g-recaptcha-response']) ) {
 			self::$error = "Captcha not submitted";
 			return false;
 		}
 		// login to <http://www.google.com/recaptcha/> by your google account for reCAPTCHA site key and secret key
-		$secret = $boxy->config['reCAPTCHA']['secret'];
-		$url    = $boxy->config['reCAPTCHA']['url'];
+		$secret = $captcha['secret'];
+		$verify = $captcha['verify'];
 		$data   = "secret={$secret}&response={$_POST['g-recaptcha-response']}&remoteip={$_SERVER['REMOTE_ADDR']}";
 		// validate captcha remotely
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_URL, $verify);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		$captcha_result = curl_exec($ch);
@@ -75,4 +153,4 @@ class Captcha {
 	}
 
 
-}
+} // Captcha
