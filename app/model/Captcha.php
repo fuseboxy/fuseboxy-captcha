@@ -1,4 +1,13 @@
-<?php
+<?php /*
+<fusedoc>
+	<history version="1.1">
+		- apply Util component for http-request to solve proxy issue
+	</history>
+	<history version="1.0">
+		- first commit
+	</history>
+</fusedoc>
+*/
 class Captcha {
 
 
@@ -99,8 +108,10 @@ class Captcha {
 					<structure name="reCAPTCHA">
 						<string name="sitekey" />
 						<string name="secret" />
-						<string name verify" />
+						<string name="verify" />
 					</structure>
+					<string name="httpProxy" optional="yes" />
+					<string name="httpsProxy" optional="yes" />
 				</structure>
 				<string name="g-recaptcha-response" scope="$_POST" comments="user submitted data" />
 			</in>
@@ -126,25 +137,22 @@ class Captcha {
 			self::$error = "Captcha not submitted";
 			return false;
 		}
-		// login to <http://www.google.com/recaptcha/> by your google account for reCAPTCHA site key and secret key
-		$secret = $captcha['secret'];
-		$verify = $captcha['verify'];
-		$data   = "secret={$secret}&response={$_POST['g-recaptcha-response']}&remoteip={$_SERVER['REMOTE_ADDR']}";
 		// validate captcha remotely
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $verify);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$captcha_result = curl_exec($ch);
-		if ( empty($captcha_result) ) {
-			self::$error = "Error occurred while validating reCAPTCHA";
+		// ===> login to <http://www.google.com/recaptcha> by your google account for reCAPTCHA site key and secret key
+		$captchaResult = Util::postPage($captcha['verify'], array(
+			'secret'   => $captcha['secret'],
+			'response' => $_POST['g-recaptcha-response'],
+			'remoteip' => $_SERVER['REMOTE_ADDR'],
+		));
+		// check response
+		if ( $captchaResult === false ) {
+			self::$error = Util::error();
 			return false;
+		// parse captcha result
 		} else {
-			$captcha_result = json_decode($captcha_result);
-			curl_close($ch);
-			// captcha result
-			if ( empty($captcha_result->success) ) {
-				self::$error = "Captcha failed (".implode(", ", $captcha_result->{'error-codes'}).")";
+			$captchaResult = json_decode($captchaResult);
+			if ( empty($captchaResult->success) ) {
+				self::$error = "Captcha failed (".implode(", ", $captchaResult->{'error-codes'}).")";
 				return false;
 			}
 		}
