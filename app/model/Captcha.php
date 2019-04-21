@@ -1,11 +1,24 @@
 <?php /*
 <fusedoc>
+	<history version="1.2">
+		- rename many variables
+		- no need to configure verify-url anymore
+	</history>
 	<history version="1.1">
 		- apply Util component for http-request to solve proxy issue
 	</history>
 	<history version="1.0">
 		- first commit
 	</history>
+	<io>
+		<in>
+			<structure name="captcha">
+				<string name="siteKey" comments="site key provided by google" />
+				<string name="secretKey" comments="secret key provided by google" />
+			</structure>
+		</in>
+		<out />
+	</io>
 </fusedoc>
 */
 class Captcha {
@@ -41,8 +54,8 @@ class Captcha {
 		<io>
 			<in>
 				<structure name="config" scope="$fusebox">
-					<structure name="reCAPTCHA" optional="yes">
-						<string name="sitekey" />
+					<structure name="captcha" optional="yes">
+						<string name="siteKey" />
 					</structure>
 				</structure>
 			</in>
@@ -51,17 +64,17 @@ class Captcha {
 	</fusedoc>
 	*/
 	public static function getField() {
-		$captcha = F::config('reCAPTCHA');
+		$captcha = F::config('captcha');
 		// validate
 		if ( empty($captcha) ) {
 			self::$error = 'Captcha config was not defined';
 			return false;
-		} elseif ( empty($captcha['sitekey']) ) {
-			self::$error = 'Captcha [sitekey] was not defined';
+		} elseif ( empty($captcha['siteKey']) ) {
+			self::$error = 'Captcha [siteKey] was not defined';
 			return false;
 		}
 		// done!
-		return "<div class='g-recaptcha' data-sitekey='{$captcha['sitekey']}' style='display: inline-block;'></div>";
+		return "<div class='g-recaptcha' data-sitekey='{$captcha['siteKey']}' style='display: inline-block;'></div>";
 	}
 
 
@@ -105,10 +118,9 @@ class Captcha {
 		<io>
 			<in>
 				<structure name="config" scope="$fusebox">
-					<structure name="reCAPTCHA">
-						<string name="sitekey" />
-						<string name="secret" />
-						<string name="verify" />
+					<structure name="captcha">
+						<string name="siteKey" />
+						<string name="secretKey" />
 					</structure>
 					<string name="httpProxy" optional="yes" />
 					<string name="httpsProxy" optional="yes" />
@@ -122,25 +134,24 @@ class Captcha {
 	</fusedoc>
 	*/
 	public static function validate() {
-		$captcha = F::config('reCAPTCHA');
+		$captcha = F::config('captcha');
 		// validate
 		if ( empty($captcha) ) {
 			self::$error = 'Captcha config was not defined';
 			return false;
-		} elseif ( empty($captcha['secret']) ) {
-			self::$error = 'Captcha [secret] was not defined';
-			return false;
-		} elseif ( empty($captcha['verify']) ) {
-			self::$error = 'Captcha [verify] was not defined';
+		} elseif ( empty($captcha['secretKey']) ) {
+			self::$error = 'Captcha [secretKey] was not defined';
 			return false;
 		} elseif ( !isset($_POST['g-recaptcha-response']) ) {
 			self::$error = "Captcha not submitted";
 			return false;
 		}
 		// validate captcha remotely
-		// ===> login to <http://www.google.com/recaptcha> by your google account for reCAPTCHA site key and secret key
-		$captchaResult = Util::postPage($captcha['verify'], array(
-			'secret'   => $captcha['secret'],
+		// ===> login to <http://www.google.com/recaptcha> by your google account
+		// ===> get site key and secret key
+		$verifyURL = 'https://www.google.com/recaptcha/api/siteverify';
+		$captchaResult = Util::postPage($verifyURL, array(
+			'secret'   => $captcha['secretKey'],
 			'response' => $_POST['g-recaptcha-response'],
 			'remoteip' => $_SERVER['REMOTE_ADDR'],
 		));
