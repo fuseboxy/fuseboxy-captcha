@@ -37,9 +37,9 @@ class TestFuseboxyCaptcha extends UnitTestCase {
 		$this->assertPattern('/captcha config was not defined/i', Captcha::error());
 		// check site key
 		Framework::loadConfig();
-		$fusebox->config['reCAPTCHA']['sitekey'] = null;
+		$fusebox->config['captcha']['siteKey'] = null;
 		$this->assertFalse( Captcha::getField() );
-		$this->assertPattern('/captcha \[sitekey\] was not defined/i', Captcha::error());
+		$this->assertPattern('/captcha \[siteKey\] was not defined/i', Captcha::error());
 		$fusebox->config = null;
 		// something must be returned
 		Framework::loadConfig();
@@ -80,7 +80,7 @@ class TestFuseboxyCaptcha extends UnitTestCase {
 		$doc = phpQuery::newDocument('<html><body>'.$output.'</body></html>');
 		// must contain site-key
 		$this->assertTrue( $doc->find('[data-sitekey]')->length != 0 );
-		$this->assertTrue( $doc->find('[data-sitekey]')->attr('data-sitekey') == $fusebox->config['reCAPTCHA']['sitekey'] );
+		$this->assertTrue( $doc->find('[data-sitekey]')->attr('data-sitekey') == $fusebox->config['captcha']['siteKey'] );
 		// clean-up
 		$fusebox = null;
 	}
@@ -94,15 +94,9 @@ class TestFuseboxyCaptcha extends UnitTestCase {
 		$this->assertPattern('/captcha config was not defined/i', Captcha::error());
 		// check secret key
 		Framework::loadConfig();
-		$fusebox->config['reCAPTCHA']['secret'] = null;
+		$fusebox->config['captcha']['secretKey'] = null;
 		$this->assertFalse( Captcha::validate() );
-		$this->assertPattern('/captcha \[secret\] was not defined/i', Captcha::error());
-		$fusebox->config = null;
-		// check verify url
-		Framework::loadConfig();
-		$fusebox->config['reCAPTCHA']['verify'] = null;
-		$this->assertFalse( Captcha::validate() );
-		$this->assertPattern('/captcha \[verify\] was not defined/i', Captcha::error());
+		$this->assertPattern('/captcha \[secretKey\] was not defined/i', Captcha::error());
 		$fusebox->config = null;
 		// check response
 		Framework::loadConfig();
