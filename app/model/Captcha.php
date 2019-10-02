@@ -1,15 +1,5 @@
 <?php /*
 <fusedoc>
-	<history version="1.2">
-		- rename many variables
-		- no need to configure verify-url anymore
-	</history>
-	<history version="1.1">
-		- apply Util component for http-request to solve proxy issue
-	</history>
-	<history version="1.0">
-		- first commit
-	</history>
 	<io>
 		<in>
 			<structure name="captcha">
@@ -22,6 +12,8 @@
 </fusedoc>
 */
 class Captcha {
+
+
 
 
 	// get (latest) error message
@@ -172,4 +164,6 @@ class Captcha {
 	}
 
 
-} // Captcha
+
+
+} // class
