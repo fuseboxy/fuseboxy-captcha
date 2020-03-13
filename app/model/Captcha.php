@@ -2,7 +2,7 @@
 <fusedoc>
 	<io>
 		<in>
-			<structure name="captcha">
+			<structure name="captcha" scope="fusebox-config">
 				<string name="siteKey" comments="site key provided by google" />
 				<string name="secretKey" comments="secret key provided by google" />
 			</structure>
