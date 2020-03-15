@@ -1,6 +1,6 @@
 {
-	"name": "henrygotmojo/fuseboxy-captcha",
-	"description": "Fuseboxy Captcha",
+	"name": "fuseboxy/fuseboxy-captcha",
+	"description": "Fuseboxy Captcha - Hassle-Free Way to Stop Bots",
 	"license": "MIT",
 	"require": {}
 }
