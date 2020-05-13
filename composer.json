@@ -2,5 +2,6 @@
 	"name": "fuseboxy/fuseboxy-captcha",
 	"description": "Fuseboxy Captcha - Hassle-Free to Stop Bots",
 	"license": "MIT",
-	"require": {}
+    "type": "fuseboxy-module",
+    "require": { "fuseboxy/fuseboxy-installer": "*" }
 }
