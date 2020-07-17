@@ -30,7 +30,7 @@ class Captcha {
 	// alias methods (for backward compatibility)
 	public static function getField() { return self::field(); }
 	public static function getClientAPI() { return self::api(); }
-	public static function renderClientAPI { self::renderAPI(); }
+	public static function renderClientAPI() { self::renderAPI(); }
 
 
 
