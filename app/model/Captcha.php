@@ -42,10 +42,28 @@ class Captcha {
 			get html of client-api javascript tag
 			===> display this snippet before the closing </head> tag on your HTML template
 		</description>
+		<io>
+			<in>
+				<structure name="$option" optional="yes">
+					<string name="onload" />
+					<string name="render" />
+				</structure>
+			</in>
+			<out />
+		</io>
 	</fusedoc>
 	*/
-	public static function api() {
-		return "<script src='https://www.google.com/recaptcha/api.js'></script>";
+	public static function api($options=[]) {
+		$path = 'https://www.google.com/recaptcha/api.js';
+		// append options to path (when necessary)
+		$i = 0;
+		foreach ( $options as $key => $val ) {
+			$path .= $i ? '&' : '?';
+			$path .= $key.'='.$val;
+			$i++;
+		}
+		// done!
+		return "<script src='{$path}' async defer></script>";
 	}
 
 
@@ -58,17 +76,20 @@ class Captcha {
 		</description>
 		<io>
 			<in>
+				<!-- config -->
 				<structure name="config" scope="$fusebox">
 					<structure name="captcha" optional="yes">
 						<string name="siteKey" />
 					</structure>
 				</structure>
+				<!-- parameter -->
+				<string name="$widgetID" optional="yes" />
 			</in>
 			<out />
 		</io>
 	</fusedoc>
 	*/
-	public static function field() {
+	public static function field($widgetID=null) {
 		$captcha = F::config('captcha');
 		// validate
 		if ( empty($captcha) ) {
@@ -76,8 +97,10 @@ class Captcha {
 		} elseif ( empty($captcha['siteKey']) ) {
 			return '[Error] Captcha [siteKey] was not defined';
 		}
-		// specify unique identifier for widget
-		$widgetID = 'g-recaptcha-'.( function_exists('random_bytes') ? bin2hex(random_bytes(16)) : uniqid() );
+		// specify unique identifier for widget (when necessary)
+		if ( empty($widgetID) ) 
+			$widgetID = 'g-recaptcha-'.( function_exists('random_bytes') ? bin2hex(random_bytes(16)) : uniqid() );
+		}
 		// done!
 		return "<div id='{$widgetID}' class='g-recaptcha' data-sitekey='{$captcha['siteKey']}' style='display: inline-block;'></div>";
 	}
