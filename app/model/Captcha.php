@@ -98,7 +98,7 @@ class Captcha {
 			return '[Error] Captcha [siteKey] was not defined';
 		}
 		// specify unique identifier for widget (when necessary)
-		if ( empty($widgetID) ) 
+		if ( empty($widgetID) ) {
 			$widgetID = 'g-recaptcha-'.( function_exists('random_bytes') ? bin2hex(random_bytes(16)) : uniqid() );
 		}
 		// done!
