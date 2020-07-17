@@ -1,5 +1,9 @@
 <?php /*
 <fusedoc>
+	<description>
+		reCAPTCHA v2 - Checkbox
+		reCAPTCHA v2 - Invisible
+	</description>
 	<io>
 		<in>
 			<structure name="captcha" scope="fusebox-config">
@@ -23,6 +27,14 @@ class Captcha {
 
 
 
+	// alias methods (for backward compatibility)
+	public static function getField() { return self::field(); }
+	public static function getClientAPI() { return self::api(); }
+	public static function renderClientAPI { self::renderAPI(); }
+
+
+
+
 	/**
 	<fusedoc>
 		<description>
@@ -31,7 +43,7 @@ class Captcha {
 		</description>
 	</fusedoc>
 	*/
-	public static function getClientAPI() {
+	public static function api() {
 		return "<script src='https://www.google.com/recaptcha/api.js'></script>";
 	}
 
@@ -55,7 +67,7 @@ class Captcha {
 		</io>
 	</fusedoc>
 	*/
-	public static function getField() {
+	public static function field() {
 		$captcha = F::config('captcha');
 		// validate
 		if ( empty($captcha) ) {
@@ -65,8 +77,14 @@ class Captcha {
 			self::$error = 'Captcha [siteKey] was not defined';
 			return false;
 		}
+		// specify unique widgetID
+		if ( function_exists('bin2hex') and function_exists('random_bytes') ) {
+			$widgetID = 'g-recaptcha-'.bin2hex(random_bytes(16));
+		} else {
+			$widgetID = 'g-recaptcha-'.uniqid();
+		}
 		// done!
-		return "<div class='g-recaptcha' data-sitekey='{$captcha['siteKey']}' style='display: inline-block;'></div>";
+		return "<div id='{$widgetID}' class='g-recaptcha' data-sitekey='{$captcha['siteKey']}' style='display: inline-block;'></div>";
 	}
 
 
@@ -79,7 +97,7 @@ class Captcha {
 		</description>
 	</fusedoc>
 	*/
-	public static function renderClientAPI() {
+	public static function renderAPI() {
 		$html = self::getClientAPI();
 		echo ( $html === false ) ? self::error() : $html;
 	}
@@ -162,8 +180,6 @@ class Captcha {
 		// success
 		return true;
 	}
-
-
 
 
 } // class
