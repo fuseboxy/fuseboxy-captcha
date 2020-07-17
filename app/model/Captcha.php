@@ -29,8 +29,9 @@ class Captcha {
 
 	// alias methods (for backward compatibility)
 	public static function getField() { return self::field(); }
+	public static function renderField() { echo self::field(); }
 	public static function getClientAPI() { return self::api(); }
-	public static function renderClientAPI() { self::renderAPI(); }
+	public static function renderClientAPI() { echo self::api(); }
 
 
 
@@ -71,50 +72,14 @@ class Captcha {
 		$captcha = F::config('captcha');
 		// validate
 		if ( empty($captcha) ) {
-			self::$error = 'Captcha config was not defined';
-			return false;
+			return '[Error] Captcha config was not defined';
 		} elseif ( empty($captcha['siteKey']) ) {
-			self::$error = 'Captcha [siteKey] was not defined';
-			return false;
+			return '[Error] Captcha [siteKey] was not defined';
 		}
-		// specify unique widgetID
-		if ( function_exists('bin2hex') and function_exists('random_bytes') ) {
-			$widgetID = 'g-recaptcha-'.bin2hex(random_bytes(16));
-		} else {
-			$widgetID = 'g-recaptcha-'.uniqid();
-		}
+		// specify unique identifier for widget
+		$widgetID = 'g-recaptcha-'.( function_exists('random_bytes') ? bin2hex(random_bytes(16)) : uniqid() );
 		// done!
 		return "<div id='{$widgetID}' class='g-recaptcha' data-sitekey='{$captcha['siteKey']}' style='display: inline-block;'></div>";
-	}
-
-
-
-
-	/**
-	<fusedoc>
-		<description>
-			display client-api javascript tag
-		</description>
-	</fusedoc>
-	*/
-	public static function renderAPI() {
-		$html = self::getClientAPI();
-		echo ( $html === false ) ? self::error() : $html;
-	}
-
-
-
-
-	/**
-	<fusedoc>
-		<description>
-			display captcha field
-		</description>
-	</fusedoc>
-	*/
-	public static function renderField() {
-		$html = self::getField();
-		echo ( $html === false ) ? self::error() : $html;
 	}
 
 
