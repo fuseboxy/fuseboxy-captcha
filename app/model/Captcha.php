@@ -54,7 +54,7 @@ class Captcha {
 	</fusedoc>
 	*/
 	public static function api($options=[]) {
-		$path = 'https://www.google.com/recaptcha/api.js';
+		$path = 'https://www.recaptcha.net/recaptcha/api.js';
 		// append options to path (when necessary)
 		$i = 0;
 		foreach ( $options as $key => $val ) {
@@ -147,7 +147,7 @@ class Captcha {
 		// validate captcha remotely
 		// ===> login to <http://www.google.com/recaptcha> by your google account
 		// ===> get site key and secret key
-		$verifyURL = 'https://www.google.com/recaptcha/api/siteverify';
+		$verifyURL = 'https://www.recaptcha.net/recaptcha/api/siteverify';
 		$captchaResult = Util::postPage($verifyURL, array(
 			'secret'   => $captcha['secretKey'],
 			'response' => $_POST['g-recaptcha-response'],
