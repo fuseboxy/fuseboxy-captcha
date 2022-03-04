@@ -78,8 +78,9 @@ class Captcha {
 			<in>
 				<!-- config -->
 				<structure name="config" scope="$fusebox">
-					<structure name="captcha" optional="yes">
+					<structure name="captcha">
 						<string name="siteKey" />
+						<string name="secretKey" />
 					</structure>
 				</structure>
 				<!-- parameter -->
@@ -96,6 +97,8 @@ class Captcha {
 			return '[Error] Captcha config was not defined';
 		} elseif ( empty($captcha['siteKey']) ) {
 			return '[Error] Captcha [siteKey] was not defined';
+		} elseif ( empty($captcha['secretKey']) ) {
+			return '[Error] Captcha [secretKey] was not defined';
 		}
 		// specify unique identifier for widget (when necessary)
 		if ( empty($widgetID) ) {
@@ -120,8 +123,6 @@ class Captcha {
 						<string name="siteKey" />
 						<string name="secretKey" />
 					</structure>
-					<string name="httpProxy" optional="yes" />
-					<string name="httpsProxy" optional="yes" />
 				</structure>
 				<string name="g-recaptcha-response" scope="$_POST" comments="user submitted data" />
 			</in>
@@ -136,6 +137,9 @@ class Captcha {
 		// validate
 		if ( empty($captcha) ) {
 			self::$error = 'Captcha config was not defined';
+			return false;
+		} elseif ( empty($captcha['siteKey']) ) {
+			self::$error = 'Captcha [siteKey] was not defined';
 			return false;
 		} elseif ( empty($captcha['secretKey']) ) {
 			self::$error = 'Captcha [secretKey] was not defined';
