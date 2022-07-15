@@ -25,3 +25,4 @@ Fuseboxy Captcha
 
 
 
+FUSEBOXY_CAPTCHA

@@ -77,11 +77,9 @@ class Captcha {
 		<io>
 			<in>
 				<!-- config -->
-				<structure name="config" scope="$fusebox">
-					<structure name="captcha">
-						<string name="siteKey" />
-						<string name="secretKey" />
-					</structure>
+				<structure name="$fusebox->config['captcha']|FUSEBOXY_CAPTCHA">
+					<string name="siteKey" />
+					<string name="secretKey" />
 				</structure>
 				<!-- parameter -->
 				<string name="$widgetID" optional="yes" />
@@ -91,7 +89,8 @@ class Captcha {
 	</fusedoc>
 	*/
 	public static function field($widgetID=null) {
-		$captcha = F::config('captcha');
+		if ( class_exists('F') ) $captcha = F::config('captcha');
+		elseif ( defined('FUSEBOXY_CAPTCHA') ) $captcha = FUSEBOXY_CAPTCHA;
 		// validate
 		if ( empty($captcha) ) {
 			return '[Error] Captcha config was not defined';
@@ -118,11 +117,9 @@ class Captcha {
 		</description>
 		<io>
 			<in>
-				<structure name="config" scope="$fusebox">
-					<structure name="captcha">
-						<string name="siteKey" />
-						<string name="secretKey" />
-					</structure>
+				<structure name="$fusebox->config['captcha']|FUSEBOXY_CAPTCHA">
+					<string name="siteKey" />
+					<string name="secretKey" />
 				</structure>
 				<string name="g-recaptcha-response" scope="$_POST" comments="user submitted data" />
 			</in>
@@ -133,7 +130,8 @@ class Captcha {
 	</fusedoc>
 	*/
 	public static function validate() {
-		$captcha = F::config('captcha');
+		if ( class_exists('F') ) $captcha = F::config('captcha');
+		elseif ( defined('FUSEBOXY_CAPTCHA') ) $captcha = FUSEBOXY_CAPTCHA;
 		// validate
 		if ( empty($captcha) ) {
 			self::$error = 'Captcha config was not defined';
