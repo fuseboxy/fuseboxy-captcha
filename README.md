@@ -1,14 +1,15 @@
-Fuseboxy Captcha
-================
+FUSEBOXY CAPTCHA (1.x)
+======================
 
 
-[Dependencies]
+## Dependencies
 
-- Fuseboxy framework core
-- Fuseboxy util component (for http-request)
+Fuseboxy Core (1.x)
+Fuseboxy Util (1.x) ===> for http-request
+Google reCaptcha
 
 
-[Integration]
+## Integration
 
 1. Register a site at Google reCAPTCHA (https://www.google.com/recaptcha)
    ===> choose *reCAPTCHA v2* and *"I'm not a robot" Checkbox*
@@ -24,5 +25,3 @@ Fuseboxy Captcha
 5. Call *Captcha::validate()* after your form submission
 
 
-
-FUSEBOXY_CAPTCHA
